@@ -1,0 +1,35 @@
+body {
+	display: flex;
+	flex-direction: row;
+	width:100vw;
+	height: 100vh;
+	margin:0px;
+}
+#menu {
+	border-top-color: #373737;
+	border-top-style: solid;
+}
+#messages {
+	width: 100%;
+	padding-left:1rem;
+	border-left-color: #373737;
+	border-left-style: solid;
+}
+.msg_box {
+	margin: 0.2rem;
+	margin-right: 0;
+	padding: 0.5rem;
+	background: #373737;
+	border-radius:0.5rem;
+	border-top-right-radius:0;
+	border-bottom-right-radius:0;
+}
+.msg_box > div {
+	white-space: pre-wrap;
+	word-break: break-all;
+	color: #f4f4f4;
+}
+textarea {
+	font-size: medium;
+	font-family: sans-serif;
+}

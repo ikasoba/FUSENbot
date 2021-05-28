@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>FUSENbot</title>
+	<link rel="stylesheet" type="text/css" href="/guilds.css">
+	<link rel="stylesheet" type="text/css" href="/manager.css">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+</head>
+<body>
+	<div class="menu">
+		<img class="guild_icon" src="<%-icon %>">
+		<div id="menu">
+			<div style="text-align: center;"><%-guild.name %></div>
+			<ul>
+				<li><a href="/oauth/login">トップ</a></li>
+			</ul>
+		</div>
+	</div>
+	<div id="messages">
+		<h1>messages</h1>
+	</div>
+	<script>(()=>{
+		var div = document.getElementById('messages')
+		var messages = <%-JSON.stringify(messages) %>
+		var guild = <%-JSON.stringify(guild)%>
+		for (key in messages){
+			let x = messages[key]
+			let element = document.createElement("a")
+			element.style.textDecoration="none"
+			element.href=`/manage/${guild.id}/${key}`
+			element.innerHTML=`
+			<div class="msg_box">
+				<div>${x.content}</div>
+			</div>
+			`
+			div.append(element)
+		}
+	})()</script>
+</body>
+</html>

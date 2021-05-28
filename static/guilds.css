@@ -1,0 +1,16 @@
+.guild_icon {
+	    width: 18vw;
+	    margin:0.5rem;
+	    border-radius:100%;
+}
+.guild_box > div {
+	text-align: center;
+	color: #f4f4f4;
+}
+.guild_box {
+	float: left;
+	margin: 0.2rem;
+	padding: 0.5rem;
+	background: #373737;
+	border-radius:8%;
+}

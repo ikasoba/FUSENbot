@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>FUSENbot</title>
+	<link rel="stylesheet" type="text/css" href="/guilds.css">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+</head>
+<body>
+	<h1 style="display:inline;">guilds</h1> <a href="/data/reset">データのリセット</a><br>
+	データをリセットするとギルドリストが更新されます。<br>
+	一週間後に勝手にリセットされるのであんまりサーバーを増やさない人は押さなくてもいいと思います
+	<div id="guilds">
+		
+	</div>
+	<script>(()=>{
+		var guilds = document.getElementById('guilds')
+		var servers = <%-JSON.stringify(servers) %>
+		for (var i=0;i<servers.length;i++){
+			let x = servers[i]
+			let element = document.createElement("a")
+			let url = `https://cdn.discordapp.com/icons/${x.id}/${x.icon}.png`
+			element.href=`/manage/${x.id}`
+			if (x.icon==null)url = "/null.png"
+			element.innerHTML=`
+			<div class="guild_box">
+				<img class="guild_icon" src="${url}" alt="${x.name}" title="${x.name}">
+				<div>${x.name}</div>
+			</div>
+			`
+			guilds.append(element)
+		}
+	})()</script>
+</body>
+</html>

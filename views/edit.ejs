@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>FUSENbot</title>
+	<link rel="stylesheet" type="text/css" href="/guilds.css">
+	<link rel="stylesheet" type="text/css" href="/manager.css">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+</head>
+<body>
+	<div class="menu">
+		<img class="guild_icon" src="<%-icon %>">
+		<div id="menu">
+			<div style="text-align: center;"><%-guild.name %></div>
+			<ul>
+				<li><a href="/oauth/login">トップ</a></li>
+			</ul>
+		</div>
+	</div>
+	<div id="messages" style="padding-top:1rem;">
+			<textarea required maxlength="2000" rows="12" style="width:90%;" id="content"><%-message %></textarea><br>
+			<button onclick="form_onclick()">送信</button>
+	</div>
+	<script>
+		function form_onclick(){
+			fetch(document.location.href,{method:"POST",credentials:"include",headers: {'Content-Type': 'application/json'},body:JSON.stringify({content:document.getElementById("content").value})})
+			.then(async(val)=>{
+				document.getElementById("content").value=(await val.json())["value"]
+			})
+		}
+	</script>
+</body>
+</html>
