@@ -335,7 +335,11 @@ client.on('message', (message)=>{
 		},
 		fields:[
 			{
-                name:"管理url",
+				name:"自己紹介",
+				value:"FUSENbotは共同編集のできるメッセージを貼り付けるbotだよ！",
+			},
+			{
+                name:"付箋の編集はweb上からでもできます",
                 value:"http://fusenbot.ikasoba.repl.co/oauth/login",
             },
 			{
