@@ -89,6 +89,9 @@ app.get('/', (req, res) => {
 	})
 })
 
+app.get('/invite', (req, res) => {
+	res.redirect(setting.invite)
+})
 app.get('/dev/null', (req, res) => {
 	res.status(200).send("null")
 })
@@ -341,6 +344,10 @@ client.on('message', (message)=>{
 			{
                 name:"付箋の編集はweb上からでもできます",
                 value:"http://fusenbot.ikasoba.repl.co/oauth/login",
+            },
+            {
+            	name:"招待リンク",
+            	value:"http://fusenbot.ikasoba.repl.co/invite"
             },
 			{
 				name:"create",
