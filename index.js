@@ -16,7 +16,7 @@ const fs = require("fs")
 let port = 80
 const prefix = "%"
 const setting = JSON.parse(fs.readFileSync("setting.json","UTF-8"))
-const version = "v1.0"
+const version = "v1.1"
 
 async function Afilter (array,fnc){
 	let res=[]
