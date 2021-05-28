@@ -69,7 +69,7 @@ app.use(session({
 	resave: false,
 	saveUninitialized: false,
 	cookie:{
-		httpOnly: true,
+		httpOnly: false,
 		maxage: 1000 * 60 * 60 * 24 * 7
 	},
 	store: new NedbStore({
