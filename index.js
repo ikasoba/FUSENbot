@@ -530,7 +530,7 @@ process.on("exit", function() {
     fs.writeFileSync("serverData.json", json);
 })
 process.on("SIGINT", function () {
-    process.exit(0);
+    process.exit(1);
 });
 
 const token = process.env["FUSENtoken"]
