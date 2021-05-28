@@ -1,4 +1,4 @@
 {
 	"https":false,
-	"oauth_url":"https://discord.com/api/oauth2/authorize?client_id=843436875608096798&redirect_uri=https%3A%2F%2F127.0.0.1%2Foauth%2Flogin&response_type=code&scope=identify%20guilds"
+	"oauth_url":"https://discord.com/api/oauth2/authorize?client_id=843436875608096798&redirect_uri=http%3A%2F%2FFUSENbot.ikasoba.repl.co%2Foauth%2Flogin&response_type=code&scope=identify%20guilds"
 }
