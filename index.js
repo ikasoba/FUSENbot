@@ -166,7 +166,7 @@ app.post('/manage/:id/:msgid', async(req, res,next) => {
 app.get('/oauth/login', async(req, res,next) => {
 	let guildList=[]
 	let oauth = new DiscordOauth2();
-	let redirect=`https://127.0.0.1/oauth/login`
+	let redirect=`http://FUSENbot.ikasoba.repl.co/oauth/login`
 	let _res
 	try {
 		_res=await oauth.tokenRequest({
@@ -334,6 +334,10 @@ client.on('message', (message)=>{
 			url:`${client.user.displayAvatarURL()}`
 		},
 		fields:[
+			{
+                name:"管理url",
+                value:"http://fusenbot.ikasoba.repl.co/oauth/login",
+            },
 			{
 				name:"create",
 				value:"新しく付箋を作るよ",
