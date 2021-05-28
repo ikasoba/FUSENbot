@@ -408,7 +408,7 @@ client.on('message', (message)=>{
 				.then((msg)=>{
 					if (!serverData[message.guild.id])serverData[message.guild.id]={"adminRoles":[],"stickys":{}}
 					if (!serverData[message.guild.id]["stickys"][msg.id])serverData[message.guild.id]["stickys"][msg.id]={"content":"","History":[]}
-					serverData[message.guild.id]["stickys"][msg.id]["content"]=msg.content
+					serverData[message.guild.id]["stickys"][msg.id]["content"]=command[1]
 					serverData[message.guild.id]["stickys"][msg.id]["channel"]=msg.channel.id
 				})
 			break;
@@ -444,7 +444,6 @@ client.on('message', (message)=>{
 					message.channel.send("edit <messageID> <message>\n引数を指定してください")
 					break;
 				}
-				arg[2]+="\nMessageId: "+arg[1]
 				if (!serverData[message.guild.id]["stickys"])break;
 				if (!serverData[message.guild.id]["stickys"][arg[1]])break;
 				let chid=serverData[message.guild.id]["stickys"][arg[1]]["channel"]
@@ -452,7 +451,7 @@ client.on('message', (message)=>{
 					let a=new Discord.GuildChannel(message.guild,x);
 					a=new Discord.TextChannel(message.guild,a);
 					a.messages.fetch(arg[1]).then((y)=>{
-						y.edit(arg[2])
+						y.edit(arg[2]+"\nMessageId: "+arg[1])
 						let content=serverData[message.guild.id]["stickys"][arg[1]]["content"]
 						serverData[message.guild.id]["stickys"][arg[1]]["History"].unshift(content)
 						serverData[message.guild.id]["stickys"][arg[1]]["History"]=serverData[message.guild.id]["stickys"][arg[1]]["History"].slice(0,9)
