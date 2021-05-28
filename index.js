@@ -526,7 +526,7 @@ process.on("SIGINT", function () {
     process.exit(0);
 });
 
-const token = process.env["2b2tjpDbotToken"]
+const token = process.env["FUSENtoken"]
 client.login(token);
 if (setting.https){
 	server.listen(port);
