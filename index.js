@@ -16,7 +16,7 @@ const fs = require("fs")
 let port = 80
 const prefix = "%"
 const setting = JSON.parse(fs.readFileSync("setting.json","UTF-8"))
-const version = "v1.1.1"
+const version = "v1.1.2"
 
 async function Afilter (array,fnc){
 	let res=[]
@@ -521,6 +521,12 @@ client.on('message', (message)=>{
 					hoge=`${x} ${Math.floor(parseFloat(command[3]))} ${z}`
 				}
 				message.channel.send(hoge)
+			break;
+			case "dice"
+				if (!command[1]){
+					break;
+				}
+				message.channel.send(""+~~(Math.random()*parseInt(command[1])))
 			break;
 		}
 	}
