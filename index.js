@@ -9,14 +9,18 @@ const fetch = require('node-fetch');
 const DiscordOauth2 = require("discord-oauth2");
 var session = require('express-session');
 var NedbStore = require('nedb-session-store')(session);
+const path = require('path');
 const app = express();
 const parser = new Parser();
 const client = new Discord.Client();
+const discord_buttons = require("discord-buttons")
+discord_buttons(client)
 const fs = require("fs")
 let port = 80
 const prefix = "%"
 const setting = JSON.parse(fs.readFileSync("setting.json","UTF-8"))
-const version = "v1.1.2"
+var helpEmbed
+const version = "v1.1.4"
 
 async function Afilter (array,fnc){
 	let res=[]
@@ -328,15 +332,183 @@ client.on('message', (message)=>{
 
 	if(message.author.bot)return;
 
-	let helpEmbed={embed:{
-		title:"ヘルプ",
-		footer:{
-			text:`prefix: ${prefix}`
+	if (message.content.startsWith(prefix)){
+		command=message.content.substr(prefix.length).split(" ")
+		switch (command[0].toLowerCase()){
+			default:
+				var button = new discord_buttons.MessageButton()
+					.setStyle("green")
+					.setID("reflesh_help")
+					.setEmoji("🔄")
+				message.channel.send({embed:helpEmbed,component:button})
+			break;
+			case "vote":
+				var button = new discord_buttons.MessageButton()
+					.setStyle("green")
+					.setID("vote")
+					.setEmoji("🗳️")
+				message.channel.send(Object.assign({embed:[
+
+				]},{component:button}))
+			break;
+			case "create":
+				if (!message.member.permissions.has("ADMINISTRATOR") || !message.member.roles.cache.filter(x => serverData[message.guild.id]["adminRoles"].includes(x.name)))break;
+				if (!command[1]){
+					message.channel.send(`CreateFUSEN <message>\n引数を指定してください`)
+					break;
+				}
+				message.channel.send(`${command[1]}\nMessageId: ${message.id}`)
+				.then((msg)=>{
+					if (!serverData[message.guild.id])serverData[message.guild.id]={"adminRoles":[],"stickys":{}}
+					if (!serverData[message.guild.id]["stickys"][msg.id])serverData[message.guild.id]["stickys"][msg.id]={"content":"","History":[]}
+					serverData[message.guild.id]["stickys"][msg.id]["content"]=command[1]
+					serverData[message.guild.id]["stickys"][msg.id]["channel"]=msg.channel.id
+				})
+			break;
+			case "addrole":
+			if (!message.member.permissions.has("ADMINISTRATOR"))break;
+				if (!command[1]){
+					message.channel.send("AddRole <RoleName>\n引数を指定してください")
+					break;
+				}
+				if (!serverData[message.guild.id])serverData[message.guild.id]={"adminRoles":[],"stickys":{}}
+				serverData[message.guild.id]["adminRoles"].push(command[1])
+				message.channel.send("たぶん成功")
+				//console.log( message.member.roles.cache.filter(x => x.name=="admin") )
+			break;
+			case "delrole":
+				if (!message.member.permissions.has("ADMINISTRATOR"))break;
+				if (!command[1]){
+					message.channel.send("DelRole <RoleName>\n引数を指定してください")
+					break;
+				}
+				if (!serverData[message.guild.id])serverData[message.guild.id]={"adminRoles":[],"stickys":{}}
+				if (serverData[message.guild.id]["adminRoles"].indexOf(command[1])!=-1){
+					let index=serverData[message.guild.id]["adminRoles"].indexOf(command[1])
+					serverData[message.guild.id]["adminRoles"].splice(index,1)
+					message.channel.send("たぶん成功")
+				}
+				//	console.log( message.member.roles.cache.filter(x => x.name=="admin") )
+			break;
+			case "edit":
+				if (!message.member.permissions.has("ADMINISTRATOR") || !message.member.roles.cache.filter(x => serverData[message.guild.id]["adminRoles"].includes(x.name)))break;
+				let arg=_split(message.content.substr(prefix.length)," ",3)
+				if (!arg[1] || !arg[2]){
+					message.channel.send("edit <messageID> <message>\n引数を指定してください")
+					break;
+				}
+				if (!serverData[message.guild.id]["stickys"])break;
+				if (!serverData[message.guild.id]["stickys"][arg[1]])break;
+				let chid=serverData[message.guild.id]["stickys"][arg[1]]["channel"]
+				client.channels.fetch(chid).then((x)=>{
+					let a=new Discord.GuildChannel(message.guild,x);
+					a=new Discord.TextChannel(message.guild,a);
+					a.messages.fetch(arg[1]).then((y)=>{
+						y.edit(arg[2]+"\nMessageId: "+arg[1])
+						let content=serverData[message.guild.id]["stickys"][arg[1]]["content"]
+						serverData[message.guild.id]["stickys"][arg[1]]["History"].unshift(content)
+						serverData[message.guild.id]["stickys"][arg[1]]["History"]=serverData[message.guild.id]["stickys"][arg[1]]["History"].slice(0,9)
+						serverData[message.guild.id]["stickys"][arg[1]]["content"]=arg[2]
+						message.channel.send(`\`${x.name}\` のメッセージの内容を\n\`\`\`${arg[2]}\`\`\`にしました`)
+					})
+				})
+			break;
+			case "omikuji":
+				let res=omikuji[~~(Math.random()*omikuji.length)]
+				message.channel.send({embed:{
+					"author":{
+						"name":`${message.author.username}`
+					},
+					"title":`${res.name}`,
+					"description":`${res.info[~~(Math.random()*res.info.length)]}`,
+				}})
+			break;
+			case "coord.tonether":
+				if (!command[1] || !command[2]){
+					message.channel.send("引数すくない")
+					break;
+				}
+				var hoge=""
+				if (!command[3]){
+					var x=parseFloat(command[1])
+					var z=parseFloat(command[2])
+					x=Math.floor(x/8)
+					z=Math.floor(z/8)
+					hoge=`${x} y ${z}`
+				}else{
+					var x=parseFloat(command[1])
+					var z=parseFloat(command[2])
+					x=Math.floor(x)/8
+					z=Math.floor(z)/8
+					hoge=`${x} ${Math.floor(parseFloat(command[3]))} ${z}`
+				}
+				message.channel.send(hoge)
+			break;
+			case "coord.tooverworld":
+				if (!command[1] || !command[2]){
+					message.channel.send("引数すくない")
+					break;
+				}
+				var hoge=""
+				if (!command[3]){
+					var x=parseFloat(command[1])
+					var z=parseFloat(command[2])
+					x=Math.floor(x*8)
+					z=Math.floor(z*8)
+					hoge=`${x} ~ ${z}`
+				}else{
+					var x=parseFloat(command[1])
+					var z=parseFloat(command[2])
+					x=Math.floor(x)*8
+					z=Math.floor(z)*8
+					hoge=`${x} ${Math.floor(parseFloat(command[3]))} ${z}`
+				}
+				message.channel.send(hoge)
+			break;
+			case "dice":
+				if (!command[1]){
+					break;
+				}
+				message.channel.send(""+~~(Math.random()*parseInt(command[1])))
+			break;
+			case "ncodice":
+				var r="";
+				var msg=message.channel.send("...")
+				for (var i=0;i<6;i++){
+					r+=(["う","ま","ち","ん","こ","お"])[~~(Math.random()*6)]
+				}
+				msg.edit(r)
+			break;
+		}
+	}
+});
+
+client.on('clickButton', async (button) => {
+	if (button.id=="reflesh_help"){
+		button.message.edit({embed:helpEmbed})
+		setTimeout(()=>{
+			let btn = new discord_buttons.MessageButton()
+					.setStyle("green")
+					.setID("reflesh_help")
+					.setEmoji("🔄")
+			button.message.edit({embed:helpEmbed,component:btn})
+		},60000)
+		await button.defer()
+
+	}
+})
+
+var bootTime
+client.on('ready', ()=>{
+	helpEmbed = {
+		"title":"ヘルプ",
+		"footer":{
+			"text":`prefix: ${prefix}`
 		},
-		thumbnail:{
-			url:`${client.user.displayAvatarURL()}`
+		"thumbnail":{
+			"url":`${client.user.displayAvatarURL()}`
 		},
-		fields:[
+		"fields":[
 			{
 				name:"自己紹介",
 				value:"FUSENbotは共同編集のできるメッセージを貼り付けるbotだよ！",
@@ -390,149 +562,17 @@ client.on('message', (message)=>{
 				inline:true
 			},
 			{
-				name:"coord.toOverWorld",
+				name:"coord.toOverworld",
 				value:"ネザーの座標をオーバーワールドの座標に変換するよ",
+				inline:true
+			},
+			{
+				name:"ncodice",
+				value:"テケトーにNCODICEを再現してみたよ",
 				inline:true
 			}
 		]
-	}}
-
-	if (message.content.startsWith(prefix)){
-		command=message.content.substr(prefix.length).split(" ")
-		switch (command[0]){
-			default:
-				message.channel.send(helpEmbed)
-			break;
-			case "foo":
-				message.reply("bar")
-			break;
-			case "create":
-				if (!command[1]){
-					message.channel.send(`CreateFUSEN <message>\n引数を指定してください`)
-					break;
-				}
-				message.channel.send(`${command[1]}\nMessageId: ${message.id}`)
-				.then((msg)=>{
-					if (!serverData[message.guild.id])serverData[message.guild.id]={"adminRoles":[],"stickys":{}}
-					if (!serverData[message.guild.id]["stickys"][msg.id])serverData[message.guild.id]["stickys"][msg.id]={"content":"","History":[]}
-					serverData[message.guild.id]["stickys"][msg.id]["content"]=command[1]
-					serverData[message.guild.id]["stickys"][msg.id]["channel"]=msg.channel.id
-				})
-			break;
-			case "AddRole":
-			if (!message.member.permissions.has("ADMINISTRATOR"))break;
-				if (!command[1]){
-					message.channel.send("AddRole <RoleName>\n引数を指定してください")
-					break;
-				}
-				if (!serverData[message.guild.id])serverData[message.guild.id]={"adminRoles":[],"stickys":{}}
-				serverData[message.guild.id]["adminRoles"].push(command[1])
-				message.channel.send("たぶん成功")
-				//console.log( message.member.roles.cache.filter(x => x.name=="admin") )
-			break;
-			case "DelRole":
-				if (!message.member.permissions.has("ADMINISTRATOR"))break;
-				if (!command[1]){
-					message.channel.send("DelRole <RoleName>\n引数を指定してください")
-					break;
-				}
-				if (!serverData[message.guild.id])serverData[message.guild.id]={"adminRoles":[],"stickys":{}}
-				if (serverData[message.guild.id]["adminRoles"].indexOf(command[1])!=-1){
-					let index=serverData[message.guild.id]["adminRoles"].indexOf(command[1])
-					serverData[message.guild.id]["adminRoles"].splice(index,1)
-					message.channel.send("たぶん成功")
-				}
-				//	console.log( message.member.roles.cache.filter(x => x.name=="admin") )
-			break;
-			case "edit":
-				if (!message.member.permissions.has("ADMINISTRATOR") || !message.member.roles.cache.filter(x => serverData[message.guild.id]["adminRoles"].includes(x.name)))break;
-				let arg=_split(message.content.substr(prefix.length)," ",3)
-				if (!arg[1] || !arg[2]){
-					message.channel.send("edit <messageID> <message>\n引数を指定してください")
-					break;
-				}
-				if (!serverData[message.guild.id]["stickys"])break;
-				if (!serverData[message.guild.id]["stickys"][arg[1]])break;
-				let chid=serverData[message.guild.id]["stickys"][arg[1]]["channel"]
-				client.channels.fetch(chid).then((x)=>{
-					let a=new Discord.GuildChannel(message.guild,x);
-					a=new Discord.TextChannel(message.guild,a);
-					a.messages.fetch(arg[1]).then((y)=>{
-						y.edit(arg[2]+"\nMessageId: "+arg[1])
-						let content=serverData[message.guild.id]["stickys"][arg[1]]["content"]
-						serverData[message.guild.id]["stickys"][arg[1]]["History"].unshift(content)
-						serverData[message.guild.id]["stickys"][arg[1]]["History"]=serverData[message.guild.id]["stickys"][arg[1]]["History"].slice(0,9)
-						serverData[message.guild.id]["stickys"][arg[1]]["content"]=arg[2]
-						message.channel.send(`\`${x.name}\` のメッセージの内容を\n\`\`\`${arg[2]}\`\`\`にしました`)
-					})
-				})
-			break;
-			case "omikuji":
-				let res=omikuji[~~(Math.random()*omikuji.length)]
-				message.channel.send({embed:{
-					"author":{
-						"name":`${message.author.username}`
-					},
-					"title":`${res.name}`,
-					"description":`${res.info[~~(Math.random()*res.info.length)]}`,
-				}})
-			break;
-			case "server.iconURL":
-				message.channel.send(message.guild.iconURL())
-			break;
-			case "coord.toNether":
-				if (!command[1] || !command[2]){
-					message.channel.send("引数すくない")
-					break;
-				}
-				var hoge=""
-				if (!command[3]){
-					var x=parseFloat(command[1])
-					var z=parseFloat(command[2])
-					x=Math.floor(x/8)
-					z=Math.floor(z/8)
-					hoge=`${x} y ${z}`
-				}else{
-					var x=parseFloat(command[1])
-					var z=parseFloat(command[2])
-					x=Math.floor(x)/8
-					z=Math.floor(z)/8
-					hoge=`${x} ${Math.floor(parseFloat(command[3]))} ${z}`
-				}
-				message.channel.send(hoge)
-			break;
-			case "coord.toOverWorld":
-				if (!command[1] || !command[2]){
-					message.channel.send("引数すくない")
-					break;
-				}
-				var hoge=""
-				if (!command[3]){
-					var x=parseFloat(command[1])
-					var z=parseFloat(command[2])
-					x=Math.floor(x*8)
-					z=Math.floor(z*8)
-					hoge=`${x} ~ ${z}`
-				}else{
-					var x=parseFloat(command[1])
-					var z=parseFloat(command[2])
-					x=Math.floor(x)*8
-					z=Math.floor(z)*8
-					hoge=`${x} ${Math.floor(parseFloat(command[3]))} ${z}`
-				}
-				message.channel.send(hoge)
-			break;
-			case "dice"
-				if (!command[1]){
-					break;
-				}
-				message.channel.send(""+~~(Math.random()*parseInt(command[1])))
-			break;
-		}
 	}
-});
-var bootTime
-client.on('ready', ()=>{
 	bootTime=new Date().getTime()
 	console.log(`Logged in as ${client.user.tag}`);
 	client.user.setActivity(`${prefix}help | ${version}`,{type:"PLAYING"})

@@ -1,5 +1,4 @@
 .guild_icon {
-	    width: 18vw;
 	    margin:0.5rem;
 	    border-radius:100%;
 }
@@ -13,4 +12,7 @@
 	padding: 0.5rem;
 	background: #373737;
 	border-radius:8%;
+	display: flex;
+	flex-direction: column;
+	width: 18vw;
 }
