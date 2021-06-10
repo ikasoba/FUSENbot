@@ -504,7 +504,8 @@ client.on('clickButton', async (button) => {
 
 var bootTime
 client.on('ready', async()=>{
-	domain=(await (await fetch("https://inet-ip.info/json").json())["Hostname"]).match(/\[(.+)\.\]/)[1]
+	domain=(await (await fetch("https://inet-ip.info/json")).json())["Hostname"].match(/\[(.+)\.\]/)[1]
+	console.log(domain)
 	helpEmbed = {
 		"title":"ヘルプ",
 		"footer":{
