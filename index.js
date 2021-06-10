@@ -189,7 +189,8 @@ app.get('/oauth/login', async(req, res,next) => {
 	}catch{}
 	if ((_res==undefined || !req.query.code) && (req.session.servers==undefined || req.session.servers=="[]")){
 		res.redirect(setting.oauth_url)
-		return next()
+		next()
+		return
 	}
 	let server_arr=[]
 	if (req.session.servers==undefined)req.session.servers="[]"
@@ -223,7 +224,7 @@ app.get('/oauth/login', async(req, res,next) => {
 		}
 		req.session.servers=JSON.stringify(server_arr)
 	}
-	return res.render('oauth.ejs', {
+	res.render('oauth.ejs', {
 		code:req.query.code,
 		servers:server_arr
 	})
