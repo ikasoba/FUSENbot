@@ -366,7 +366,7 @@ client.on('message', (message)=>{
 				]},{component:button}))
 			break;
 			case "create":
-				if (!message.member.permissions.has("ADMINISTRATOR") || serverData[message.guild.id]["adminRoles"]!=undefined && !message.member.roles.cache.filter(x => serverData[message.guild.id]["adminRoles"].includes(x.name)))break;
+				if (!message.member.permissions.has("ADMINISTRATOR") || (serverData[message.guild.id] && !message.member.roles.cache.filter(x => serverData[message.guild.id]["adminRoles"].includes(x.name))))break;
 				if (!command[1]){
 					message.channel.send(`CreateFUSEN <message>\n引数を指定してください`)
 					break;
@@ -375,7 +375,7 @@ client.on('message', (message)=>{
 				.then((msg)=>{
 					console.log("[MSG] modified to serverData")
 					if (!serverData[message.guild.id])serverData[message.guild.id]={"adminRoles":[],"stickys":{}}
-					if (!serverData[message.gui9ld.id]["stickys"][msg.id])serverData[message.guild.id]["stickys"][msg.id]={"content":"","History":[]}
+					if (!serverData[message.guild.id]["stickys"][msg.id])serverData[message.guild.id]["stickys"][msg.id]={"content":"","History":[]}
 					serverData[message.guild.id]["stickys"][msg.id]["content"]=command[1]
 					serverData[message.guild.id]["stickys"][msg.id]["channel"]=msg.channel.id
 				})
