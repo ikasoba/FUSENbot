@@ -230,7 +230,15 @@ app.get('/oauth/login', async(req, res,next) => {
 	})
 })
 
-var serverData=JSON.parse(fs.readFileSync("serverData.json","UTF-8"))
+var txt
+try {
+	txt=fs.readFileSync("serverData.json","UTF-8")
+}catch{
+	fs.writeFileSync("serverData.json","{}")
+	txt=fs.readFileSync("serverData.json","UTF-8")
+}
+
+var serverData=JSON.parse(txt)
 var SAMPLEserverData={
 	"(serverID)":{
 		"prefix":"",
