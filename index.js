@@ -204,7 +204,7 @@ app.get('/oauth/login', async(req, res,next) => {
 		let user=new Discord.User(client,z)	// ロールが必要なので変換
 		for (var i=0;i<_res.length;i++){
 			let x=_res[i]
-			let y=client.guilds.cache.get(x.id)
+			let y=client.guilds.fetch(x.id)
 			if ((y==undefined || !serverData[x.id])==false){
 				y=await client.guilds.fetch(x.id)
 				let role=await y.members.fetch(user.id)
