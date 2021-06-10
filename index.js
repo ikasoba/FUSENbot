@@ -189,8 +189,7 @@ app.get('/oauth/login', async(req, res,next) => {
 	}catch{}
 	if ((_res==undefined || !req.query.code) && (req.session.servers==undefined || req.session.servers=="[]")){
 		res.redirect(setting.oauth_url)
-		next()
-		return
+		return next()
 	}
 	let server_arr=[]
 	if (req.session.servers==undefined)req.session.servers="[]"
@@ -224,7 +223,7 @@ app.get('/oauth/login', async(req, res,next) => {
 		}
 		req.session.servers=JSON.stringify(server_arr)
 	}
-	res.render('oauth.ejs', {
+	return res.render('oauth.ejs', {
 		code:req.query.code,
 		servers:server_arr
 	})
@@ -252,6 +251,7 @@ var SAMPLEserverData={
 		}
 	}
 }
+
 var date=new Date()
 function zerofill(int,max){
 	return "0".repeat( max-((int+"").length) )+(int+"")
