@@ -17,7 +17,7 @@ const discord_buttons = require("discord-buttons")
 discord_buttons(client)
 const fs = require("fs")
 const setting = JSON.parse(fs.readFileSync("setting.json","UTF-8"))
-let port = setting.port
+let port = process.env["PORT"] || setting.port
 const prefix = "%"
 var helpEmbed
 const version = "v1.1.4"
@@ -503,7 +503,8 @@ client.on('clickButton', async (button) => {
 })
 
 var bootTime
-client.on('ready', ()=>{
+client.on('ready', async()=>{
+	domain=((await fetch("https://inet-ip.info/json").json())["Hostname"]).match(/\[(.+)\.\]/)[1]
 	helpEmbed = {
 		"title":"ヘルプ",
 		"footer":{
@@ -519,11 +520,11 @@ client.on('ready', ()=>{
 			},
 			{
                 name:"付箋の編集はweb上からでもできます",
-                value:"http://fusenbot.ikasoba.repl.co/oauth/login",
+                value:`http://${domain}:${port}/oauth/login`,
             },
             {
             	name:"招待リンク",
-            	value:"http://fusenbot.ikasoba.repl.co/invite"
+            	value:`http://${domain}:${port}/invite`
             },
 			{
 				name:"create",
