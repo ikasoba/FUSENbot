@@ -366,7 +366,7 @@ client.on('message', (message)=>{
 				]},{component:button}))
 			break;
 			case "create":
-				if (!message.member.permissions.has("ADMINISTRATOR") || !message.member.roles.cache.filter(x => serverData[message.guild.id]["adminRoles"].includes(x.name)))break;
+				if (!message.member.permissions.has("ADMINISTRATOR") || serverData[message.guild.id]["adminRoles"]!=undefined && !message.member.roles.cache.filter(x => serverData[message.guild.id]["adminRoles"].includes(x.name)))break;
 				if (!command[1]){
 					message.channel.send(`CreateFUSEN <message>\n引数を指定してください`)
 					break;
