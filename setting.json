@@ -1,6 +1,6 @@
 {
 	"port":8080,
 	"https":false,
-	"oauth_url":"https://discord.com/api/oauth2/authorize?client_id=843436875608096798&redirect_uri=http%3A%2F%2FFUSENbot.ikasoba.repl.co%2Foauth%2Flogin&response_type=code&scope=identify%20guilds",
-	"invite":"https://discord.com/api/oauth2/authorize?client_id=843436875608096798&permissions=268684288&redirect_uri=http%3A%2F%2FFUSENbot.ikasoba.repl.co%2Foauth%2Flogin&scope=bot"
+	"oauth_url":"https://discord.com/api/oauth2/authorize?client_id=843436875608096798&redirect_uri=http%3A%2F%2Ffusenbot.ikasoba.repl.co%2Foauth%2Flogin&response_type=code&scope=identify%20guilds",
+	"invite":"https://discord.com/api/oauth2/authorize?client_id=843436875608096798&permissions=0&scope=bothttps://discord.com/api/oauth2/authorize?client_id=843436875608096798&permissions=268684288&scope=bot"
 }
