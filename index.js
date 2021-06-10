@@ -16,9 +16,9 @@ const client = new Discord.Client();
 const discord_buttons = require("discord-buttons")
 discord_buttons(client)
 const fs = require("fs")
-let port = 80
-const prefix = "%"
 const setting = JSON.parse(fs.readFileSync("setting.json","UTF-8"))
+let port = setting.port
+const prefix = "%"
 var helpEmbed
 const version = "v1.1.4"
 
@@ -65,7 +65,6 @@ if (setting.https){
 	  cert: fs.readFileSync('./server_crt.pem')
 	};
 	var server = https.createServer(options,app);
-	port = 443
 }
 
 app.use(session({
