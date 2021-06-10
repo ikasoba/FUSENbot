@@ -504,7 +504,7 @@ client.on('clickButton', async (button) => {
 
 var bootTime
 client.on('ready', async()=>{
-	domain=(await (await fetch("https://inet-ip.info/json")).json())["Hostname"].match(/\[(.+)\.\]/)[1]
+	domain="fusen-bot.herokuapp.com"
 	console.log(domain)
 	helpEmbed = {
 		"title":"ヘルプ",
@@ -521,11 +521,11 @@ client.on('ready', async()=>{
 			},
 			{
                 name:"付箋の編集はweb上からでもできます",
-                value:`http://${domain}:${port}/oauth/login`,
+                value:`http://${domain}/oauth/login`,
             },
             {
             	name:"招待リンク",
-            	value:`http://${domain}:${port}/invite`
+            	value:`http://${domain}/invite`
             },
 			{
 				name:"create",
