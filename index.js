@@ -373,8 +373,9 @@ client.on('message', (message)=>{
 				}
 				message.channel.send(`${command[1]}\nMessageId: ${message.id}`)
 				.then((msg)=>{
+					console.log("[MSG] modified to serverData")
 					if (!serverData[message.guild.id])serverData[message.guild.id]={"adminRoles":[],"stickys":{}}
-					if (!serverData[message.guild.id]["stickys"][msg.id])serverData[message.guild.id]["stickys"][msg.id]={"content":"","History":[]}
+					if (!serverData[message.gui9ld.id]["stickys"][msg.id])serverData[message.guild.id]["stickys"][msg.id]={"content":"","History":[]}
 					serverData[message.guild.id]["stickys"][msg.id]["content"]=command[1]
 					serverData[message.guild.id]["stickys"][msg.id]["channel"]=msg.channel.id
 				})
