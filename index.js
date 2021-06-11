@@ -111,9 +111,9 @@ app.get('/manage/:id', async(req, res,next) => {
 		servers=JSON.parse(req.session.servers)
 	}catch{
 		req.session.servers=""
-		servers={}
+		servers=[]
 	}
-	if (servers.filter((x)=>x.id==req.params.id).length==0){
+	if (servers servers.filter((x)=>x.id==req.params.id).length==0){
 		res.status(500).send("<pre>"+JSON.stringify(servers,null," ").replace(req.params.id,`<b>${req.params.id}</b>`)+"</pre>")
 		next()
 		return
