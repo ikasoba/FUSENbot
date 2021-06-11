@@ -125,7 +125,7 @@ app.get('/manage/:id', async(req, res,next) => {
 			let c=await g.channels.cache.get(serverData[req.params.id]["stickys"][key].channel)
 			let m
 			try{
-				m=c.messages.fetch(key)
+				m=await c.messages.fetch(key)
 			}catch{
 
 			}
