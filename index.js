@@ -20,7 +20,7 @@ const setting = JSON.parse(fs.readFileSync("setting.json","UTF-8"))
 let port = process.env["PORT"] || setting.port
 const prefix = "%"
 var helpEmbed
-const version = "v1.1.4"
+const version = "v1.2"
 var domain="fusen-bot.herokuapp.com"
 
 async function Afilter (array,fnc){
@@ -333,11 +333,11 @@ var omikuji=[
 			"おっさんに「違う、私がおまえの父親だ」と言われても冷静さを保とう",
 			"おっさんはいつだって君を追いかけるよ",
 			"||`|д・)ﾁﾗｯ`||",
-			`
+			`\`\`\`
 			＿人人人人人＿
 			＞　大　凶　＜
 			￣Y^Y^Y^Y^Y￣
-			`
+			\`\`\``
 		]
 	},
 ]
@@ -488,11 +488,24 @@ client.on('message', (message)=>{
 			break;
 			case "ncodice":
 				var r="";
-				var msg=message.channel.send("...")
-				for (var i=0;i<6;i++){
-					r+=(["う","ま","ち","ん","こ","お"])[~~(Math.random()*6)]
-				}
-				msg.edit(r)
+				message.channel.send("...").then((msg)=>{
+					for (var i=0;i<6;i++){
+						r+=(["う","ま","ち","ん","こ","お"])[~~(Math.random()*6)]
+					}
+					var ncoanim=(str,i,msg)=>{
+						console.log(msg)
+						msg.edit(str.substr(0,i))
+						if (i<=str.length){setTimeout(ncoanim,500,str,i+2,msg)
+						}else if((i>=str.length)){
+							if (str.match(/お?ちんこ/)){
+								msg.edit(str+"\n>>"+str.match(/お?ちんこ/)[1]+"<<")
+							}else if (str.match(/うんこ|ち/)){
+								msg.edit(str+"\n>>"+str.match(/うんこ|ち/)[1]+"<<")
+							}
+						}
+					}
+					setTimeout(ncoanim,2000,r,2,msg)
+				})
 			break;
 		}
 	}
@@ -531,11 +544,11 @@ client.on('ready', async()=>{
 			},
 			{
                 name:"付箋の編集はweb上からでもできます",
-                value:`http://${domain}/oauth/login`,
+                value:`${domain}/oauth/login`,
             },
             {
             	name:"招待リンク",
-            	value:`http://${domain}/invite`
+            	value:`${domain}/invite`
             },
 			{
 				name:"create",
