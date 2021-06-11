@@ -212,7 +212,7 @@ app.get('/oauth/login', async(req, res,next) => {
 	}
 	let server_arr=[]
 	if (req.session.servers==undefined)req.session.servers="[]"
-	if (JSON.parse(req.session.servers).length>0){
+	if (JSON.parse(req.session.servers || "null").length>0){
 		server_arr=JSON.parse(req.session.servers)
 	}
 	if (_res && server_arr.length==0){
