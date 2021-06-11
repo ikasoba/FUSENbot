@@ -155,13 +155,23 @@ app.get('/manage/:id/:msgid', (req, res,next) => {
 		return
 	}
 	let message = "null"
-	if (serverData[req.params.id]["stickys"][req.params.msgid]["content"]){
-		message=serverData[req.params.id]["stickys"][req.params.msgid]["content"]
+	let g=await client.guilds.fetch(req.params.id)
+	if (g.available){
+		let c=await g.channels.cache.get(serverData[req.params.id]["stickys"][key].channel)
+		let m
+		try{
+			m=await c.messages.fetch(key)
+		}catch{
+
+		}
+		if (serverData[req.params.id]["stickys"][req.params.msgid]["content"]){
+			message=serverData[req.params.id]["stickys"][req.params.msgid]["content"]
+		}
+		let icon
+		let guild = (servers.filter((x)=>x.id==req.params.id))[0]
+		icon = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
+		if (guild.icon==null)icon = "/null.png"
 	}
-	let icon
-	let guild = (servers.filter((x)=>x.id==req.params.id))[0]
-	icon = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
-	if (guild.icon==null)icon = "/null.png"
 	res.render('edit.ejs', {
 		message:message,
 		guild:(servers.filter((x)=>x.id==req.params.id))[0],
@@ -599,11 +609,6 @@ client.on('ready', async()=>{
 				inline:true,
 			},
 			{
-				name:"foo",
-				value:"barって送るよ",
-				inline:true
-			},
-			{
 				name:"coord.toNether",
 				value:"オーバーワールドの座標をネザーの座標に変換するよ",
 				inline:true
@@ -615,7 +620,7 @@ client.on('ready', async()=>{
 			},
 			{
 				name:"ncodice",
-				value:"テケトーにNCODICEを再現してみたよ",
+				value:"雑にNCODICEを再現してみたよ",
 				inline:true
 			}
 		]
