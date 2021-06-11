@@ -123,6 +123,7 @@ app.get('/manage/:id', async(req, res,next) => {
 		let g=await client.guilds.fetch(req.params.id)
 		if (g.available){
 			let c=await g.channels.cache.get(serverData[req.params.id]["stickys"][key].channel)
+			console.log(c)
 			c = await new Discord.TextChannel(c.guild,c)
 			let m
 			try{
