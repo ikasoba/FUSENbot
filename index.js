@@ -126,11 +126,13 @@ app.get('/manage/:id', async(req, res,next) => {
 			let m
 			try{
 				m=c.messages.fetch(key)
+			}catch{
+
+			}
+			if (m){
 				messages[key]={
 					"content":serverData[req.params.id]["stickys"][key]["content"]
 				}
-			}catch{
-
 			}
 		}
 	}
