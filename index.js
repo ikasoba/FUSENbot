@@ -21,7 +21,7 @@ let port = process.env["PORT"] || setting.port
 const prefix = "%"
 var helpEmbed
 const version = "v1.2"
-var domain="fusen-bot.herokuapp.com"
+var domain="https://fusen-bot.herokuapp.com"
 
 async function Afilter (array,fnc){
 	let res=[]
@@ -173,7 +173,7 @@ app.post('/manage/:id/:msgid', async(req, res,next) => {
 app.get('/oauth/login', async(req, res,next) => {
 	let guildList=[]
 	let oauth = new DiscordOauth2();
-	let redirect=`https://${domain}/oauth/login`
+	let redirect=`${domain}/oauth/login`
 	let _res
 	try {
 		_res=await oauth.tokenRequest({
