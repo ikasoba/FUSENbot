@@ -105,8 +105,14 @@ app.get('/data/reset', (req, res) => {
 	res.status(200).send("updated")
 })
 
-app.get('/manage/:id', (req, res,next) => {
-	let servers=JSON.parse(req.session.servers)
+app.get('/manage/:id', async(req, res,next) => {
+	let servers
+	try {
+		servers=JSON.parse(req.session.servers)
+	}catch{
+		req.session.servers=""
+		servers={}
+	}
 	if (servers.filter((x)=>x.id==req.params.id).length==0){
 		res.status(500).send("<pre>"+JSON.stringify(servers,null," ").replace(req.params.id,`<b>${req.params.id}</b>`)+"</pre>")
 		next()
@@ -114,8 +120,19 @@ app.get('/manage/:id', (req, res,next) => {
 	}
 	let messages={}
 	for (var key in serverData[req.params.id]["stickys"]){
-		messages[key]={
-			"content":serverData[req.params.id]["stickys"][key]["content"]
+		let g=await client.guilds.fetch(req.params.id)
+		if (g.available){
+			let c=await g.channels.cache.get(serverData[req.params.id]["stickys"][key].channel)
+			c = await new Discord.TextChannel(c.guild,c)
+			let m
+			try{
+				m=c.messages.fetch(key)
+				messages[key]={
+					"content":serverData[req.params.id]["stickys"][key]["content"]
+				}
+			}catch{
+
+			}
 		}
 	}
 	let icon
