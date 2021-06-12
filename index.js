@@ -147,7 +147,7 @@ app.get('/manage/:id', async(req, res,next) => {
 	})
 })
 
-app.get('/manage/:id/:msgid', (req, res,next) => {
+app.get('/manage/:id/:msgid', async(req, res,next) => {
 	let servers=JSON.parse(req.session.servers)
 	if (servers.filter((x)=>x.id==req.params.id).length==0){
 		res.status(500).send("<pre>"+JSON.stringify(servers,null," ").replace(req.params.id,`<b>${req.params.id}</b>`)+"</pre>")
@@ -373,7 +373,7 @@ var omikuji=[
 client.on('message', (message)=>{
 
 	if(message.author.bot)return;
-
+	if (!serverData[message.guild.id])serverData[message.guild.id]={"adminRoles":[],"stickys":{}}
 	if (message.content.startsWith(prefix)){
 		command=message.content.substr(prefix.length).split(" ")
 		switch (command[0].toLowerCase()){
@@ -407,6 +407,18 @@ client.on('message', (message)=>{
 					serverData[message.guild.id]["stickys"][msg.id]["content"]=command[1]
 					serverData[message.guild.id]["stickys"][msg.id]["channel"]=msg.channel.id
 				})
+			break;
+			case "configure":
+				if (!message.member.permissions.has("ADMINISTRATOR"))break;
+				if (!command[1] || !command[2]){
+					message.channel.send("configure <config> <value>\n引数を指定してください")
+					break;
+				}
+				if (!command[1]=="muterole"){
+					serverData[message.guild.id]["muterole"]=command[2]
+				}else if (!command[1]=="muterange"){
+					serverData[message.guild.id]["muterange"]=command[2]
+				}
 			break;
 			case "addrole":
 			if (!message.member.permissions.has("ADMINISTRATOR"))break;
@@ -538,6 +550,14 @@ client.on('message', (message)=>{
 		}
 	}
 });
+
+client.on("guildMemberAdd",async(member)=>{
+	if ((member.user.createdAt.getTime() - new date().getTime())<=parseInt(serverData[message.guild.id]["muterange"])*1000*60){
+		let role=(member.guild.roles.cache.filter(x => serverData[message.guild.id]["muterole"]==x.name))
+		member.roles.add(role)
+	}
+	
+})
 
 client.on('clickButton', async (button) => {
 	if (button.id=="reflesh_help"){
