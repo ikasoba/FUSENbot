@@ -552,7 +552,7 @@ client.on('message', (message)=>{
 });
 
 client.on("guildMemberAdd",(member)=>{
-	if ((member.user.createdAt.getTime() - new date().getTime())<=parseInt(serverData[message.guild.id]["muterange"])*1000*60){
+	if ((member.user.createdAt.getTime() - new Date().getTime())<=parseInt(serverData[message.guild.id]["muterange"])*1000*60){
 		let role=(member.guild.roles.cache.filter(x => serverData[message.guild.id]["muterole"]==x.name))
 		if (role)member.roles.add(role)
 	}
