@@ -552,11 +552,12 @@ client.on('message', (message)=>{
 });
 
 client.on("guildMemberAdd",(member)=>{
-	if (Math.abs(member.user.createdAt.getTime() - new Date().getTime())<=parseInt(serverData[member.guild.id]["muterange"])*1000*60){
+	if (Math.abs(member.user.createdAt.getTime() - new Date().getTime())<=(parseFloat(serverData[member.guild.id]["muterange"])*1000*60)){
 		let role=(member.guild.roles.cache.filter(x => serverData[member.guild.id]["muterole"]==x.name))
-		if (role)member.roles.add(role)
+		if (role!=undefined)member.roles.add(role)
+			console.log("チェンジロール")
 	}
-	console.log("だれかがjoin")
+	
 })
 
 client.on('clickButton', async (button) => {
