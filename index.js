@@ -5,6 +5,7 @@ const DiscordOauth2 = require("discord-oauth2");
 const parser = new Parser();
 const client = new Discord.Client();
 const discord_buttons = require("discord-buttons")
+const http = require('http');
 discord_buttons(client)
 const fs = require("fs")
 const setting = JSON.parse(fs.readFileSync("setting.json","UTF-8"))
@@ -12,6 +13,11 @@ let port = process.env["PORT"] || setting.port
 const prefix = "f."
 var helpEmbed
 const version = "v1.0Z"
+
+http.createServer((req, res) => {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end('\n');
+}).listen(port, () => console.log('port='+port));
 
 async function Afilter (array,fnc){
 	let res=[]
