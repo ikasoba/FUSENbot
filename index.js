@@ -2,7 +2,6 @@ const Discord = require('discord.js');
 require('discord-reply');
 const Parser = require('rss-parser');
 const DiscordOauth2 = require("discord-oauth2");
-const app = express();
 const parser = new Parser();
 const client = new Discord.Client();
 const discord_buttons = require("discord-buttons")
@@ -12,7 +11,7 @@ const setting = JSON.parse(fs.readFileSync("setting.json","UTF-8"))
 let port = process.env["PORT"] || setting.port
 const prefix = "f."
 var helpEmbed
-const version = "v1.2"
+const version = "v1.0Z"
 
 async function Afilter (array,fnc){
 	let res=[]
@@ -373,7 +372,6 @@ client.on('clickButton', async (button) => {
 
 var bootTime
 client.on('ready', async()=>{
-	console.log(domain)
 	helpEmbed = {
 		"title":"ヘルプ",
 		"footer":{
