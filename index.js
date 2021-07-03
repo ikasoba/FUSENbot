@@ -1,15 +1,7 @@
 const Discord = require('discord.js');
 require('discord-reply');
 const Parser = require('rss-parser');
-const express = require('express');
-const bodyParser = require('body-parser');
-const ejs = require('ejs');
-const https = require('https');
-const fetch = require('node-fetch');
 const DiscordOauth2 = require("discord-oauth2");
-var session = require('express-session');
-var NedbStore = require('nedb-session-store')(session);
-const path = require('path');
 const app = express();
 const parser = new Parser();
 const client = new Discord.Client();
@@ -18,10 +10,9 @@ discord_buttons(client)
 const fs = require("fs")
 const setting = JSON.parse(fs.readFileSync("setting.json","UTF-8"))
 let port = process.env["PORT"] || setting.port
-const prefix = "%"
+const prefix = "f."
 var helpEmbed
 const version = "v1.2"
-var domain="https://fusen-bot.herokuapp.com"
 
 async function Afilter (array,fnc){
 	let res=[]
@@ -59,204 +50,6 @@ async function sendAll(str){
 		a.send(str)
 	}
 }
-
-if (setting.https){
-	var options = {
-	  key:  fs.readFileSync('./server_key.pem'),
-	  cert: fs.readFileSync('./server_crt.pem')
-	};
-	var server = https.createServer(options,app);
-}
-
-app.use(session({
-	secret: 'hogefugafoobar',
-	resave: false,
-	saveUninitialized: false,
-	cookie:{
-		httpOnly: false,
-		maxage: 1000 * 60 * 60 * 24 * 7
-	},
-	store: new NedbStore({
-		filename: './db/session.db'
-	})
-}));
-
-app.use(bodyParser.urlencoded({
-    extended: true
-}))
-app.set('ejs', ejs.renderFile);
-app.use(express.static('static'));
-app.use(bodyParser.json());
-
-app.get('/', (req, res) => {
-	res.render('index.ejs', {
-	})
-})
-
-app.get('/invite', (req, res) => {
-	res.redirect(setting.invite)
-})
-app.get('/dev/null', (req, res) => {
-	res.status(200).send("null")
-})
-
-app.get('/data/reset', (req, res) => {
-	req.session.servers=undefined
-	res.status(200).send("updated")
-})
-
-app.get('/manage/:id', async(req, res,next) => {
-	let servers
-	try {
-		servers=JSON.parse(req.session.servers)
-	}catch{
-		req.session.servers=""
-		servers=[]
-	}
-	if (servers.length>=0 && servers.filter((x)=>x.id==req.params.id).length==0){
-		res.status(500).send("<pre>"+JSON.stringify(servers,null," ").replace(req.params.id,`<b>${req.params.id}</b>`)+"</pre>")
-		next()
-		return
-	}
-	let messages={}
-	for (var key in serverData[req.params.id]["stickys"]){
-		let g=await client.guilds.fetch(req.params.id)
-		if (g.available){
-			let c=await g.channels.cache.get(serverData[req.params.id]["stickys"][key].channel)
-			let m
-			try{
-				m=await c.messages.fetch(key)
-			}catch{
-
-			}
-			if (m){
-				messages[key]={
-					"content":serverData[req.params.id]["stickys"][key]["content"]
-				}
-			}
-		}
-	}
-	let icon
-	let guild = (servers.filter((x)=>x.id==req.params.id))[0]
-	icon = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
-	if (guild.icon==null)icon = "/null.png"
-	res.render('messages.ejs', {
-		messages:messages,
-		guild:(servers.filter((x)=>x.id==req.params.id))[0],
-		icon:icon,
-	})
-})
-
-app.get('/manage/:id/:msgid', async(req, res,next) => {
-	let servers=JSON.parse(req.session.servers)
-	if (servers.filter((x)=>x.id==req.params.id).length==0){
-		res.status(500).send("<pre>"+JSON.stringify(servers,null," ").replace(req.params.id,`<b>${req.params.id}</b>`)+"</pre>")
-		next()
-		return
-	}
-	let message = "null"
-	let g=await client.guilds.fetch(req.params.id)
-	if (g.available){
-		let c=await g.channels.cache.get(serverData[req.params.id]["stickys"][key].channel)
-		let m
-		try{
-			m=await c.messages.fetch(key)
-		}catch{
-
-		}
-		if (serverData[req.params.id]["stickys"][req.params.msgid]["content"]){
-			message=serverData[req.params.id]["stickys"][req.params.msgid]["content"]
-		}
-		let icon
-		let guild = (servers.filter((x)=>x.id==req.params.id))[0]
-		icon = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
-		if (guild.icon==null)icon = "/null.png"
-	}
-	res.render('edit.ejs', {
-		message:message,
-		guild:(servers.filter((x)=>x.id==req.params.id))[0],
-		icon:icon,
-	})
-})
-
-app.post('/manage/:id/:msgid', async(req, res,next) => {
-	if (!req.body.content){
-		res.status(401).send(JSON.stringify({"error":true}))
-		next()
-		return
-	}
-	let content = req.body.content
-	let guild = await client.guilds.fetch(req.params.id)
-	let x = await client.channels.fetch(serverData[req.params.id]["stickys"][req.params.msgid]["channel"])
-	let a=new Discord.GuildChannel(guild,x);
-	a=new Discord.TextChannel(guild,a);
-	let y = await a.messages.fetch(req.params.msgid)
-	y.edit(`${content}\nMessageId: ${req.params.msgid}`)
-	serverData[req.params.id]["stickys"][req.params.msgid]["History"].unshift(serverData[req.params.id]["stickys"][req.params.msgid]["content"])
-	serverData[req.params.id]["stickys"][req.params.msgid]["History"]=serverData[req.params.id]["stickys"][req.params.msgid]["History"].slice(0,9)
-	serverData[req.params.id]["stickys"][req.params.msgid]["content"]=`${content}`
-	res.json({"value":serverData[req.params.id]["stickys"][req.params.msgid]["content"]})
-})
-
-app.get('/oauth/login', async(req, res,next) => {
-	let guildList=[]
-	let oauth = new DiscordOauth2();
-	let redirect=`${domain}/oauth/login`
-	let _res
-	try {
-		_res=await oauth.tokenRequest({
-		    clientId: "843436875608096798",
-		    clientSecret: "wAo3cDguGWy3tdNYCAyZzN-joc16FmLq",
- 
-    		code: `${req.query.code}`,
-    		scope: "identify guilds",
-   		 	grantType: "authorization_code",
-   	 
-   		 	redirectUri: `${redirect}`,
-		})
-	}catch{}
-	if ((_res==undefined || !req.query.code) && (req.session.servers==undefined || req.session.servers=="[]")){
-		res.redirect(setting.oauth_url)
-		next()
-		return
-	}
-	let server_arr=[]
-	if (req.session.servers==undefined)req.session.servers="[]"
-	if (JSON.parse(req.session.servers || "null").length>0){
-		server_arr=JSON.parse(req.session.servers)
-	}
-	if (_res && server_arr.length==0){
-		let token=_res.access_token
-		_res=await oauth.getUserGuilds(token)
-		let z=await oauth.getUser(token)	// 公式apiからなのでdiscord.jsのオブジェクトは帰ってこない
-		let user=new Discord.User(client,z)	// ロールが必要なので変換
-		for (var i=0;i<_res.length;i++){
-			let x=_res[i]
-			let y=client.guilds.cache.get(x.id)
-			if ((y==undefined || !serverData[x.id])==false){
-				y=await client.guilds.fetch(x.id)
-				let role=await y.members.fetch(user.id)
-				let _roles = role.roles.cache.filter( (n)=>(
-					serverData[x.id].adminRoles.includes(n.name)
-				))
-				if (
-					serverData[x.id] &&
-					(
-						x.owner==true ||
-						_roles!=undefined && _roles.size!=false
-					)
-				){
-					server_arr.push(x)
-				}
-			}
-		}
-		req.session.servers=JSON.stringify(server_arr)
-	}
-	res.render('oauth.ejs', {
-		code:req.query.code,
-		servers:server_arr
-	})
-})
 
 var txt
 try {
@@ -373,16 +166,13 @@ var omikuji=[
 client.on('message', (message)=>{
 
 	if(message.author.bot)return;
+	if (message.channel.type=="dm")return;
 	if (!serverData[message.guild.id])serverData[message.guild.id]={"adminRoles":[],"stickys":{}}
 	if (message.content.startsWith(prefix)){
 		command=message.content.substr(prefix.length).split(" ")
 		switch (command[0].toLowerCase()){
 			default:
-				var button = new discord_buttons.MessageButton()
-					.setStyle("green")
-					.setID("reflesh_help")
-					.setEmoji("🔄")
-				message.channel.send({embed:helpEmbed,component:button})
+				message.channel.send({embed:helpEmbed})
 			break;
 			case "vote":
 				var button = new discord_buttons.MessageButton()
@@ -413,11 +203,6 @@ client.on('message', (message)=>{
 				if (!command[1] || !command[2]){
 					message.channel.send("configure <config> <value>\n引数を指定してください")
 					break;
-				}
-				if (!command[1]=="muterole"){
-					serverData[message.guild.id]["muterole"]=command[2]
-				}else if (!command[1]=="muterange"){
-					serverData[message.guild.id]["muterange"]=command[2]
 				}
 			break;
 			case "addrole":
@@ -520,6 +305,30 @@ client.on('message', (message)=>{
 				}
 				message.channel.send(hoge)
 			break;
+			case "length":
+				if (command.length-1<4){
+					message.channel.send("引数が少ない 最小4個から～")
+					break;
+				}
+				var a
+				var speed=``
+				console.log(command)
+				if(command.length-1>=6){
+
+					// x,y,z,x,y,z
+					a=Math.sqrt((command[1]-command[4])**2 + (command[2]-command[5])**2 + (command[3]-command[6])**2)
+
+				}else if (command.length-1>=4){
+
+					// x,z,x,z
+					a=Math.sqrt((command[1]-command[3])**2 + (command[2]-command[4])**2)
+
+				}
+				if((command.length-1)%2==1){
+					speed=`\n${~~(a/command[command.length-1])}秒かかるかも...?`
+				}
+				message.channel.send(`距離は${~~a}ブロックの気がする...。${speed}`)
+			break;
 			case "dice":
 				if (!command[1]){
 					break;
@@ -533,15 +342,8 @@ client.on('message', (message)=>{
 						r+=(["う","ま","ち","ん","こ","お"])[~~(Math.random()*6)]
 					}
 					var ncoanim=(str,i,msg)=>{
-						console.log(msg)
 						msg.edit(str.substr(0,i))
 						if (i<=str.length){setTimeout(ncoanim,500,str,i+2,msg)
-						}else if((i>=str.length)){
-							if (str.match(/お?ちんこ/)){
-								msg.edit(str+"\n>>"+str.match(/お?ちんこ/)[1]+"<<")
-							}else if (str.match(/うんこ|ち/)){
-								msg.edit(str+"\n>>"+str.match(/うんこ|ち/)[1]+"<<")
-							}
 						}
 					}
 					setTimeout(ncoanim,2000,r,2,msg)
@@ -552,13 +354,6 @@ client.on('message', (message)=>{
 });
 
 client.on("guildMemberAdd",(member)=>{
-	console.log((parseFloat(serverData[member.guild.id]["muterange"])*1000*60*60*24),Math.abs(member.user.createdAt.getTime() - new Date().getTime()))
-	if (Math.abs(member.user.createdAt.getTime() - new Date().getTime())<=(parseFloat(serverData[member.guild.id]["muterange"])*1000*60*60*24)){
-		let role=(member.guild.roles.cache.filter(x => serverData[member.guild.id]["muterole"]==x.name))
-		if (role!=undefined)member.roles.add(role)
-			console.log("チェンジロール")
-	}
-	
 })
 
 client.on('clickButton', async (button) => {
@@ -590,16 +385,16 @@ client.on('ready', async()=>{
 		"fields":[
 			{
 				name:"自己紹介",
-				value:"FUSENbotは共同編集のできるメッセージを貼り付けるbotだよ！",
+				value:"FUSENbotはたのしいたのしいボットだよ！",
 			},
-			{
+			/*{
                 name:"付箋の編集はweb上からでもできます",
                 value:`${domain}/oauth/login`,
             },
             {
             	name:"招待リンク",
             	value:`${domain}/invite`
-            },
+            },*/
 			{
 				name:"create",
 				value:"新しく付箋を作るよ",
@@ -641,6 +436,11 @@ client.on('ready', async()=>{
 				inline:true
 			},
 			{
+				name:"length",
+				value:"距離と時間を計算するやつ",
+				inline:true
+			},
+			{
 				name:"ncodice",
 				value:"雑にNCODICEを再現してみたよ",
 				inline:true
@@ -660,11 +460,13 @@ process.on("SIGINT", function () {
     process.exit(1);
 });
 
+function autosave(func){
+	var json = JSON.stringify(serverData, null, "\t");
+    fs.writeFileSync("serverData.json", json);
+	setTimeout(func,1000*60*5)
+}
+
+setTimeout(autosave,1000*60*5,autosave)
+
 const token = process.env["FUSENtoken"]
 client.login(token);
-if (setting.https){
-	server.listen(port);
-}else{
-	app.listen(port);
-}
-console.log("HTTPサーバーPORT = " + port);
